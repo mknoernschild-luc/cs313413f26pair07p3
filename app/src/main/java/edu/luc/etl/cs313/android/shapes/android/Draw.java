@@ -10,8 +10,6 @@ import edu.luc.etl.cs313.android.shapes.model.*;
  */
 public class Draw implements Visitor<Void> {
 
-    // TODO entirely your job (except onCircle)
-
     private final Canvas canvas;
 
     private final Paint paint;
@@ -30,45 +28,66 @@ public class Draw implements Visitor<Void> {
 
     @Override
     public Void onStrokeColor(final StrokeColor c) {
-
+        final int oldColor = paint.getColor();
+        paint.setColor(c.getColor());
+        c.getShape().accept(this);
+        paint.setColor(oldColor);
         return null;
     }
 
     @Override
     public Void onFill(final Fill f) {
-
+        final Style oldStyle = paint.getStyle();
+        paint.setStyle(Style.FILL_AND_STROKE);
+        f.getShape().accept(this);
+        paint.setStyle(oldStyle);
         return null;
     }
 
     @Override
     public Void onGroup(final Group g) {
-
+        for (final Shape s : g.getShapes()) {
+            s.accept(this);
+        }
         return null;
     }
 
     @Override
     public Void onLocation(final Location l) {
-
+        canvas.translate(l.getX(), l.getY());
+        l.getShape().accept(this);
+        canvas.translate(-l.getX(), -l.getY());
         return null;
     }
 
     @Override
     public Void onRectangle(final Rectangle r) {
-
+        canvas.drawRect(0, 0, r.getWidth(), r.getHeight(), paint);
         return null;
     }
 
     @Override
     public Void onOutline(Outline o) {
-
+        final Style oldStyle = paint.getStyle();
+        paint.setStyle(Style.STROKE);
+        o.getShape().accept(this);
+        paint.setStyle(oldStyle);
         return null;
     }
 
     @Override
     public Void onPolygon(final Polygon s) {
-
-        final float[] pts = null;
-
+        final var points = s.getPoints();
+        final int n = points.size();
+        final float[] pts = new float[4 * n];
+        for (int i = 0; i < n; i++) {
+            final Point from = points.get(i);
+            final Point to = points.get((i + 1) % n);
+            pts[4 * i]     = from.getX();
+            pts[4 * i + 1] = from.getY();
+            pts[4 * i + 2] = to.getX();
+            pts[4 * i + 3] = to.getY();
+        }
         canvas.drawLines(pts, paint);
         return null;
     }
