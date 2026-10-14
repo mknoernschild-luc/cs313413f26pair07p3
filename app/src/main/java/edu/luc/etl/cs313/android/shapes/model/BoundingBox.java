@@ -7,8 +7,6 @@ package edu.luc.etl.cs313.android.shapes.model;
  */
 public class BoundingBox implements Visitor<Location> {
 
-    // TODO entirely your job (except onCircle)
-
     @Override
     public Location onCircle(final Circle c) {
         final int radius = c.getRadius();
@@ -32,22 +30,21 @@ public class BoundingBox implements Visitor<Location> {
 
             minX = Math.min(minX, b.getX());
             minY = Math.min(minY, b.getY());
-            maxX = Math.max(maxX, b.getX());
-            maxY = Math.max(maxY, b.getY());
-
+            maxX = Math.max(maxX, b.getX() + r.getWidth());
+            maxY = Math.max(maxY, b.getY() + r.getHeight());
         }
-        return new Location(minY, minX, newRectangle(maxX - minX, maxY - minY));
+        return new Location(minX, minY, new Rectangle(maxX - minX, maxY - minY));
     }
 
     @Override
     public Location onLocation(final Location l) {
-        final Location b = 1.getShape().accept(this);
-        return new Location(1.getX() + b.getX(), 1.getY() + b.getY(), b.getShape());
+        final Location b = l.getShape().accept(this);
+        return new Location(l.getX() + b.getX(), l.getY() + b.getY(), b.getShape());
     }
 
     @Override
     public Location onRectangle(final Rectangle r) {
-        return new Location(0, 0, new Rectangle(r.width(), r.height()));
+        return new Location(0, 0, new Rectangle(r.getWidth(), r.getHeight()));
     }
 
     @Override
