@@ -13,13 +13,17 @@ public final class StrokeColor implements Shape {
     public StrokeColor(final int color, final Shape shape) {
         this.color = color;
         this.shape = shape;
+        this.color = color;
+        this.shape = shape;
     }
 
     public int getColor() {
         return color;
+        return color;
     }
 
     public Shape getShape() {
+        return shape;
         return shape;
     }
 
